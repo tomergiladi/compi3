@@ -1,0 +1,129 @@
+%{
+	#include "output.hpp"
+	#include <iostream>
+	#include <stdlib.h>
+
+	using namespace std;
+
+	extern int yylex();
+    extern int yylineno;
+	int yyerror(const char * message);
+    #define YYDEBUG 1
+%}
+
+%token tkvoid
+%token tkint
+%token tkbyte
+%token tkbool
+%token tkb
+
+
+%token tktrue
+%token tkfalse
+%token tkreturn
+
+%token tkbreak
+%token tkcontinue
+%token tksc
+%token tkcomma
+
+%token tklbrace
+%token tkrbrace
+%token tkif
+%token tkwhile
+
+%token tkid
+%token tknumber
+%token tksrting
+
+%left tkassign
+%left tkor
+%left tkand
+%left tkequality
+%nonassoc tkorder
+%left tkarithmetic
+%left tkproduct
+%right tknot
+%left tklp
+%left tkrp
+%nonassoc then
+%nonassoc tkelse
+
+%%
+
+Program	:	Funcs
+		{
+           output::printProductionRule(1);
+		}
+	;
+
+Funcs	:   /* empty */ {output::printProductionRule(2); }
+    | FuncDecl Funcs {output::printProductionRule(3);}
+	;
+FuncDecl :  RetType tkid tklp Formals tkrp tklbrace Statements tkrbrace {output::printProductionRule(4);};
+RetType :   Type{output::printProductionRule(5);};
+RetType :   tkvoid{output::printProductionRule(6);};
+Formals	:   /* empty */ {output::printProductionRule(7);}
+	|	FormalsList {output::printProductionRule(8); }
+	;
+FormalsList :   FormalDecl {output::printProductionRule(9);} 
+    |   FormalDecl tkcomma FormalsList {output::printProductionRule(10);}
+    ;
+FormalDecl : Type tkid {output::printProductionRule(11);};
+Statements : Statement {output::printProductionRule(12);}
+        |   Statements Statement{output::printProductionRule(13);}
+        ;
+Exp : tklp Exp tkrp {output::printProductionRule(34);}
+    | Exp tkarithmetic Exp {output::printProductionRule(35);}
+    | Exp tkproduct Exp {output::printProductionRule(35);}
+    | tkid {output::printProductionRule(36);}
+    | Call {output::printProductionRule(37);}
+    | tknumber {output::printProductionRule(38);}
+    | tknumber tkb {output::printProductionRule(39);} 
+    | tksrting {output::printProductionRule(40);}
+    | tktrue {output::printProductionRule(41);} 
+    | tkfalse {output::printProductionRule(42);}
+    | tknot Exp {output::printProductionRule(43);}
+    | Exp tkand Exp {output::printProductionRule(44);}
+    | Exp tkor Exp {output::printProductionRule(45);}
+    | Exp tkequality Exp {output::printProductionRule(46);}
+    | Exp tkorder Exp {output::printProductionRule(46);}
+    ;
+Statement : tklbrace Statements tkrbrace {output::printProductionRule(14);}
+    | Type tkid tksc {output::printProductionRule(15);} 
+    | Type tkid tkassign Exp tksc {output::printProductionRule(16);} 
+    | tkid tkassign Exp tksc {output::printProductionRule(17);} 
+    | Call tksc {output::printProductionRule(18);}
+    | tkreturn tksc{output::printProductionRule(19);}
+    | tkreturn Exp tksc{output::printProductionRule(20);}
+    | tkif tklp Exp tkrp Statement {output::printProductionRule(21);} %prec then
+    | tkif tklp Exp tkrp Statement tkelse Statement {output::printProductionRule(22);}
+    | tkwhile tklp Exp tkrp Statement {output::printProductionRule(23);} %prec then
+    | tkwhile tklp Exp tkrp Statement tkelse Statement {output::printProductionRule(24);}
+    | tkbreak tksc{output::printProductionRule(25);}
+    | tkcontinue tksc{output::printProductionRule(26);}
+    ;
+Call : tkid tklp ExpList tkrp {output::printProductionRule(27);}
+    | tkid tklp tkrp {output::printProductionRule(28);}
+    ;
+ExpList : Exp{output::printProductionRule(29);}
+    | Exp tkcomma ExpList {output::printProductionRule(30);}
+    ;
+Type : tkint {output::printProductionRule(31);}
+    | tkbyte {output::printProductionRule(32);}
+    | tkbool {output::printProductionRule(33);}
+    ;
+
+%%
+
+int main()
+{
+    //yydebug = 1; 
+	yyparse();
+}
+
+int yyerror(const char * message)
+{
+	output::errorSyn(yylineno);
+	exit(0);
+}
