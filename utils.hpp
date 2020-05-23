@@ -1,5 +1,6 @@
 #ifndef __utils_H
 #include "string"
+#include "vector"
 using std::string;
 #define __utils_H
 struct Expression{
@@ -16,6 +17,6 @@ struct Token {
 typedef union {
     Token token;
     Expression expression;
-};
+} STYPE;
 #define YYSTYPE STYPE	// Tell Bison to use STYPE as the stack type
 #endif
