@@ -57,14 +57,14 @@ Program	:	Funcs
 		}
 	;
 
-Funcs	:   /* empty */ {} }
+Funcs	:   /* empty */ {}
     | FuncDecl Funcs {}
 	;
 FuncDecl :  RetType tkid tklp Formals tkrp tklbrace Statements tkrbrace {}
 RetType :   Type{}
 RetType :   tkvoid{}
 Formals	:   /* empty */ {}
-	|	FormalsList {} }
+	|	FormalsList {}
 	;
 FormalsList :   FormalDecl {} 
     |   FormalDecl tkcomma FormalsList {}
