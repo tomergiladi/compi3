@@ -1,4 +1,5 @@
 %{
+	#include "utils.hpp"
 	#include "output.hpp"
 	#include "parser.tab.hpp"
 	
@@ -36,7 +37,7 @@ continue return tkcontinue;
 
 \+|\-	return tkarithmetic;
 \*|\/	return tkproduct;
-[a-zA-Z]([a-zA-Z0-9])*	return tkid;
+[a-zA-Z]([a-zA-Z0-9])*	{yylval.lexeme(yytext); return tkid};
 0|[1-9][0-9]*	return tknumber;
 \"([^\n\r\"\\]|\\[rnt"\\])+\" return tksrting;
 [\t\n ] ;

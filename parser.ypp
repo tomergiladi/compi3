@@ -53,65 +53,65 @@
 
 Program	:	Funcs
 		{
-           output::printProductionRule(1);
+           ;
 		}
 	;
 
-Funcs	:   /* empty */ {output::printProductionRule(2); }
-    | FuncDecl Funcs {output::printProductionRule(3);}
+Funcs	:   /* empty */ {} }
+    | FuncDecl Funcs {}
 	;
-FuncDecl :  RetType tkid tklp Formals tkrp tklbrace Statements tkrbrace {output::printProductionRule(4);};
-RetType :   Type{output::printProductionRule(5);};
-RetType :   tkvoid{output::printProductionRule(6);};
-Formals	:   /* empty */ {output::printProductionRule(7);}
-	|	FormalsList {output::printProductionRule(8); }
+FuncDecl :  RetType tkid tklp Formals tkrp tklbrace Statements tkrbrace {}
+RetType :   Type{}
+RetType :   tkvoid{}
+Formals	:   /* empty */ {}
+	|	FormalsList {} }
 	;
-FormalsList :   FormalDecl {output::printProductionRule(9);} 
-    |   FormalDecl tkcomma FormalsList {output::printProductionRule(10);}
+FormalsList :   FormalDecl {} 
+    |   FormalDecl tkcomma FormalsList {}
     ;
-FormalDecl : Type tkid {output::printProductionRule(11);};
-Statements : Statement {output::printProductionRule(12);}
-        |   Statements Statement{output::printProductionRule(13);}
+FormalDecl : Type tkid {}
+Statements : Statement {}
+        |   Statements Statement{}
         ;
-Exp : tklp Exp tkrp {output::printProductionRule(34);}
-    | Exp tkarithmetic Exp {output::printProductionRule(35);}
-    | Exp tkproduct Exp {output::printProductionRule(35);}
-    | tkid {output::printProductionRule(36);}
-    | Call {output::printProductionRule(37);}
-    | tknumber {output::printProductionRule(38);}
-    | tknumber tkb {output::printProductionRule(39);} 
-    | tksrting {output::printProductionRule(40);}
-    | tktrue {output::printProductionRule(41);} 
-    | tkfalse {output::printProductionRule(42);}
-    | tknot Exp {output::printProductionRule(43);}
-    | Exp tkand Exp {output::printProductionRule(44);}
-    | Exp tkor Exp {output::printProductionRule(45);}
-    | Exp tkequality Exp {output::printProductionRule(46);}
-    | Exp tkorder Exp {output::printProductionRule(46);}
+Exp : tklp Exp tkrp {}
+    | Exp tkarithmetic Exp {}
+    | Exp tkproduct Exp {}
+    | tkid {}
+    | Call {}
+    | tknumber {}
+    | tknumber tkb {} 
+    | tksrting {}
+    | tktrue {} 
+    | tkfalse {}
+    | tknot Exp {}
+    | Exp tkand Exp {}
+    | Exp tkor Exp {}
+    | Exp tkequality Exp {}
+    | Exp tkorder Exp {}
     ;
-Statement : tklbrace Statements tkrbrace {output::printProductionRule(14);}
-    | Type tkid tksc {output::printProductionRule(15);} 
-    | Type tkid tkassign Exp tksc {output::printProductionRule(16);} 
-    | tkid tkassign Exp tksc {output::printProductionRule(17);} 
-    | Call tksc {output::printProductionRule(18);}
-    | tkreturn tksc{output::printProductionRule(19);}
-    | tkreturn Exp tksc{output::printProductionRule(20);}
-    | tkif tklp Exp tkrp Statement {output::printProductionRule(21);} %prec then
-    | tkif tklp Exp tkrp Statement tkelse Statement {output::printProductionRule(22);}
-    | tkwhile tklp Exp tkrp Statement {output::printProductionRule(23);} %prec then
-    | tkwhile tklp Exp tkrp Statement tkelse Statement {output::printProductionRule(24);}
-    | tkbreak tksc{output::printProductionRule(25);}
-    | tkcontinue tksc{output::printProductionRule(26);}
+Statement : tklbrace Statements tkrbrace {}
+    | Type tkid tksc {} 
+    | Type tkid tkassign Exp tksc {} 
+    | tkid tkassign Exp tksc {} 
+    | Call tksc {}
+    | tkreturn tksc{}
+    | tkreturn Exp tksc{}
+    | tkif tklp Exp tkrp Statement {} %prec then
+    | tkif tklp Exp tkrp Statement tkelse Statement {}
+    | tkwhile tklp Exp tkrp Statement {} %prec then
+    | tkwhile tklp Exp tkrp Statement tkelse Statement {}
+    | tkbreak tksc{}
+    | tkcontinue tksc{}
     ;
-Call : tkid tklp ExpList tkrp {output::printProductionRule(27);}
-    | tkid tklp tkrp {output::printProductionRule(28);}
+Call : tkid tklp ExpList tkrp {}
+    | tkid tklp tkrp {}
     ;
-ExpList : Exp{output::printProductionRule(29);}
-    | Exp tkcomma ExpList {output::printProductionRule(30);}
+ExpList : Exp{}
+    | Exp tkcomma ExpList {}
     ;
-Type : tkint {output::printProductionRule(31);}
-    | tkbyte {output::printProductionRule(32);}
-    | tkbool {output::printProductionRule(33);}
+Type : tkint {}
+    | tkbyte {}
+    | tkbool {}
     ;
 
 %%
