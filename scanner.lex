@@ -1,6 +1,6 @@
 %{
 	#include "utils.hpp"
-	#include "output.hpp"
+	#include "hw3_output.hpp"
 	#include "parser.tab.hpp"
 	
 %}
