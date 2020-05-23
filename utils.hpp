@@ -1,4 +1,6 @@
 #ifndef __utils_H
+#include "string"
+using std::string;
 #define __utils_H
 struct Expression{
     string type;
