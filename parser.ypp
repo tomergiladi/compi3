@@ -127,6 +127,7 @@ Type : tkint {$$.type="INT"}
 int main()
 {
     //yydebug = 1; 
+    cout << "a" << endl;
 	yyparse();
 }
 

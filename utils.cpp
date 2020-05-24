@@ -33,6 +33,6 @@ void insertToScope(const string& identifier,const string& type){
     if(offset<0){
         offsets.push_back(offset-1);
     } else {
-        offsets.push_back(offset+1);
+        offsets.push_back(offset+ 1);
     }
 }
