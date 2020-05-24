@@ -2,7 +2,7 @@
 	#include "hw3_output.hpp"
 	#include <iostream>
 	#include <stdlib.h>
-    #include "utills.hpp"
+    #include "utils.hpp"
 	using namespace std;
 
 	extern int yylex();
