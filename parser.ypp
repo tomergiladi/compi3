@@ -2,7 +2,7 @@
 	#include "hw3_output.hpp"
 	#include <iostream>
 	#include <stdlib.h>
-
+    #include "utills.hpp"
 	using namespace std;
 
 	extern int yylex();
@@ -67,19 +67,19 @@ Funcs	:   /* empty */ {}
 	;
 FuncDecl :  RetType tkid {insertToScope($2.lexeme,$1.type);createScope(true);} tklp Formals tkrp {changeType($2.lexeme);} tklbrace Statements tkrbrace {}
 
-RetType :   Type {$$=$1;}
-RetType :   tkvoid{$$.type="VOID";}
-Formals	:   /* empty */ {}
+RetType:   Type {$$=$1;}
+         | tkvoid{$$.type="VOID";};
+Formals:   /* empty */ {}
 	|	FormalsList {}
 	;
-FormalsList :   FormalDecl {} 
+FormalsList:   FormalDecl {} 
     |   FormalDecl tkcomma FormalsList {}
     ;
-FormalDecl : Type tkid {insertToScope($2.lexeme,$1.type}
-Statements : Statement {}
+FormalDecl: Type tkid {insertToScope($2.lexeme,$1.type}
+Statements: Statement {}
         |   Statements Statement{}
         ;
-Exp : tklp Exp tkrp {$$=$2;}
+Exp: tklp Exp tkrp {$$=$2;}
     | Exp tkarithmetic Exp {$$=$1;}
     | Exp tkproduct Exp {$$=$1;}
     | tkid {$$.type=getType($1.lexeme);}
@@ -95,20 +95,22 @@ Exp : tklp Exp tkrp {$$=$2;}
     | Exp tkequality Exp {$$.type=bool;}
     | Exp tkorder Exp {$$.type=bool;}
     ;
-Statement : tklbrace {createScope();} Statements tkrbrace {endScope();}
+Statement: tklbrace {createScope();} Statements tkrbrace {endScope();}
     | Type tkid tksc {insertToScope($2.lexeme,$1.type);} 
     | Type tkid tkassign Exp tksc {insertToScope($2.lexeme,$1.type);} 
     | tkid tkassign Exp tksc {} 
     | Call tksc {}
     | tkreturn tksc{}
     | tkreturn Exp tksc{}
-    | tkif tklp Exp tkrp {createScope();} Statement {endScope();} %prec then
-    | tkif tklp Exp tkrp {createScope();} Statement  {endScope();}  tkelse {createScope();} Statement {endScope();} {}
-    | tkwhile tklp Exp tkrp {createScope();} Statement {endScope();} %prec then
-    | tkwhile tklp Exp tkrp {createScope();} Statement {endScope();} tkelse {createScope();} Statement {endScope();}
+    | tkif tklp Exp tkrp M1 Statement M2 %prec then
+    | tkif tklp Exp tkrp M1 Statement  M2  tkelse M1 Statement M2 {}
+    | tkwhile tklp Exp tkrp M1 Statement M2 %prec then
+    | tkwhile tklp Exp tkrp M1 Statement M2 tkelse M1 Statement M2
     | tkbreak tksc{}
     | tkcontinue tksc{}
     ;
+M1: {createScope();};
+M2: {endScope();};
 Call : tkid tklp ExpList tkrp {$$.type=getType($1.lexeme);}
     | tkid tklp tkrp {$$.type=getType($1.lexeme);}
     ;
