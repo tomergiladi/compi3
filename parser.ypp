@@ -32,9 +32,9 @@
 %token tkif
 %token tkwhile
 
-%token tkid
-%token tknumber
-%token tksrting
+%token<toke> tkid
+%token<token> tknumber
+%token<token> tksrting
 
 %left tkassign
 %left tkor
@@ -49,69 +49,77 @@
 %nonassoc then
 %nonassoc tkelse
 
+%type<exp> Exp
+%type<exp> Type
+%type<expList> ExpList
+%type<exp> RetType
+%type<expList> FormalsList
 %%
 
 Program	:	Funcs
 		{
-           ;
 		}
 	;
 
 Funcs	:   /* empty */ {}
     | FuncDecl Funcs {}
 	;
-FuncDecl :  RetType tkid tklp Formals tkrp tklbrace Statements tkrbrace {}
-RetType :   Type{}
-RetType :   tkvoid{}
+FuncDecl :  RetType tkid {insertToScope($2.lexeme,$1.type);createScope(true);} tklp Formals tkrp {changeType($2.lexeme);} tklbrace Statements tkrbrace {}
+
+RetType :   Type {$$=$1;}
+RetType :   tkvoid{$$.type="VOID";}
 Formals	:   /* empty */ {}
 	|	FormalsList {}
 	;
 FormalsList :   FormalDecl {} 
     |   FormalDecl tkcomma FormalsList {}
     ;
-FormalDecl : Type tkid {}
+FormalDecl : Type tkid {insertToScope($2.lexeme,$1.type}
 Statements : Statement {}
         |   Statements Statement{}
         ;
-Exp : tklp Exp tkrp {}
-    | Exp tkarithmetic Exp {}
-    | Exp tkproduct Exp {}
-    | tkid {}
-    | Call {}
-    | tknumber {}
-    | tknumber tkb {} 
-    | tksrting {}
-    | tktrue {} 
-    | tkfalse {}
-    | tknot Exp {}
-    | Exp tkand Exp {}
-    | Exp tkor Exp {}
-    | Exp tkequality Exp {}
-    | Exp tkorder Exp {}
+Exp : tklp Exp tkrp {$$=$2;}
+    | Exp tkarithmetic Exp {$$=$1;}
+    | Exp tkproduct Exp {$$=$1;}
+    | tkid {$$.type=getType($1.lexeme);}
+    | Call {$$=$1;}
+    | tknumber {$$.type="int";}  
+    | tknumber tkb {$$.type=byte;} 
+    | tksrting {$$.type="STRING";}
+    | tktrue {$$.type=bool;} 
+    | tkfalse {$$.type=bool;}
+    | tknot Exp {$$.type=bool;}
+    | Exp tkand Exp {$$.type=bool;}
+    | Exp tkor Exp {$$.type=bool;}
+    | Exp tkequality Exp {$$.type=bool;}
+    | Exp tkorder Exp {$$.type=bool;}
     ;
-Statement : tklbrace Statements tkrbrace {}
-    | Type tkid tksc {} 
-    | Type tkid tkassign Exp tksc {} 
+Statement : tklbrace {createScope();} Statements tkrbrace {endScope();}
+    | Type tkid tksc {insertToScope($2.lexeme,$1.type);} 
+    | Type tkid tkassign Exp tksc {insertToScope($2.lexeme,$1.type);} 
     | tkid tkassign Exp tksc {} 
     | Call tksc {}
     | tkreturn tksc{}
     | tkreturn Exp tksc{}
-    | tkif tklp Exp tkrp Statement {} %prec then
-    | tkif tklp Exp tkrp Statement tkelse Statement {}
-    | tkwhile tklp Exp tkrp Statement {} %prec then
-    | tkwhile tklp Exp tkrp Statement tkelse Statement {}
+    | tkif tklp Exp tkrp {createScope();} Statement {endScope();} %prec then
+    | tkif tklp Exp tkrp {createScope();} Statement  {endScope();}  tkelse {createScope();} Statement {endScope();} {}
+    | tkwhile tklp Exp tkrp {createScope();} Statement {endScope();} %prec then
+    | tkwhile tklp Exp tkrp {createScope();} Statement {endScope();} tkelse {createScope();} Statement {endScope();}
     | tkbreak tksc{}
     | tkcontinue tksc{}
     ;
-Call : tkid tklp ExpList tkrp {}
-    | tkid tklp tkrp {}
+Call : tkid tklp ExpList tkrp {$$.type=getType($1.lexeme);}
+    | tkid tklp tkrp {$$.type=getType($1.lexeme);}
     ;
-ExpList : Exp{}
-    | Exp tkcomma ExpList {}
+ExpList : Exp{$$.types={$1.type;}}
+    | Exp tkcomma ExpList {
+        $$.types=$3.types;
+        $$.types.insert($$.types.begin(),$1.type);
+    }
     ;
-Type : tkint {}
-    | tkbyte {}
-    | tkbool {}
+Type : tkint {$$.type="INT"}
+    | tkbyte {$$.type="BYTE"}
+    | tkbool {$$.type="BOOL"}
     ;
 
 %%
