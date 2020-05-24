@@ -54,6 +54,7 @@
 %type<expList> ExpList
 %type<exp> RetType
 %type<expList> FormalsList
+%type<exp> Call
 %%
 
 Program	:	Funcs
