@@ -37,9 +37,9 @@ continue return tkcontinue;
 
 \+|\-	return tkarithmetic;
 \*|\/	return tkproduct;
-[a-zA-Z]([a-zA-Z0-9])*	{yylval.token.lexeme=yytext; return tkid;}
-0|[1-9][0-9]*	{yylval.token.lexeme=yytext; return tknumber;}
-\"([^\n\r\"\\]|\\[rnt"\\])+\" {yylval.token.lexeme=yytext; return tksrting;}
+[a-zA-Z]([a-zA-Z0-9])*	{yylval=new Token(yytext); return tkid;}
+0|[1-9][0-9]*	{yylval=new Token(yytext); return tknumber;}
+\"([^\n\r\"\\]|\\[rnt"\\])+\" {yylval=new Token(yytext); return tksrting;}
 [\t\n ] ;
 \/\/[^\r\n]*(\r|\n|\r\n)? ;
 <*>. {output::errorLex(yylineno);exit(0);}; 
