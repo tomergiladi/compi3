@@ -1,0 +1,18 @@
+void printOk(bool isOk,int isnotOk) {
+    int x;
+    if (isOk){
+        int y;
+        {
+            int z;
+        }
+        print("ok");
+    } 
+}
+
+void main()
+{
+    int x = 4;
+    byte y = 100 b;
+    printOk(x>y);
+    int z;
+}

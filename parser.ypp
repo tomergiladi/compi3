@@ -32,7 +32,7 @@
 %token tkif
 %token tkwhile
 
-%token<toke> tkid
+%token<token> tkid
 %token<token> tknumber
 %token<token> tksrting
 
@@ -57,47 +57,46 @@
 %type<exp> Call
 %%
 
-Program	:	Funcs
-		{
-		}
+Program	:{init();}	Funcs
+        {endScope();}
 	;
 
 Funcs	:   /* empty */ {}
     | FuncDecl Funcs {}
 	;
-FuncDecl :  RetType tkid {insertToScope($2.lexeme,$1.type);createScope(true);} tklp Formals tkrp {changeType($2.lexeme);} tklbrace Statements tkrbrace {}
+FuncDecl :  RetType tkid {insertToScope($2->lexeme,$1->type,true);createScope(true);} tklp Formals tkrp {addArguments($2->lexeme);} tklbrace Statements tkrbrace {endScope();}
 
 RetType:   Type {$$=$1;}
-         | tkvoid{$$.type="VOID";};
+         | tkvoid{$$=new Expression();$$->type="VOID";};
 Formals:   /* empty */ {}
 	|	FormalsList {}
 	;
 FormalsList:   FormalDecl {} 
     |   FormalDecl tkcomma FormalsList {}
     ;
-FormalDecl: Type tkid {insertToScope($2.lexeme,$1.type}
+FormalDecl: Type tkid {insertToScope($2->lexeme,$1->type);}
 Statements: Statement {}
         |   Statements Statement{}
         ;
 Exp: tklp Exp tkrp {$$=$2;}
     | Exp tkarithmetic Exp {$$=$1;}
     | Exp tkproduct Exp {$$=$1;}
-    | tkid {$$.type=getType($1.lexeme);}
+    | tkid {$$=new Expression();$$->type=getType($1->lexeme);}
     | Call {$$=$1;}
-    | tknumber {$$.type="int";}  
-    | tknumber tkb {$$.type=byte;} 
-    | tksrting {$$.type="STRING";}
-    | tktrue {$$.type=bool;} 
-    | tkfalse {$$.type=bool;}
-    | tknot Exp {$$.type=bool;}
-    | Exp tkand Exp {$$.type=bool;}
-    | Exp tkor Exp {$$.type=bool;}
-    | Exp tkequality Exp {$$.type=bool;}
-    | Exp tkorder Exp {$$.type=bool;}
+    | tknumber {$$=new Expression();$$->type="INT";}  
+    | tknumber tkb {$$=new Expression();$$->type="BYTE";} 
+    | tksrting {$$=new Expression();$$->type="STRING";}
+    | tktrue {$$=new Expression();$$->type="BOOL";} 
+    | tkfalse {$$=new Expression();$$->type="BOOL";}
+    | tknot Exp {$$=new Expression();$$->type="BOOL";}
+    | Exp tkand Exp {$$=new Expression();$$->type="BOOL";}
+    | Exp tkor Exp {$$=new Expression();$$->type="BOOL";}
+    | Exp tkequality Exp {$$=new Expression();$$->type="BOOL";}
+    | Exp tkorder Exp {$$=new Expression();$$->type="BOOL";}
     ;
 Statement: tklbrace {createScope();} Statements tkrbrace {endScope();}
-    | Type tkid tksc {insertToScope($2.lexeme,$1.type);} 
-    | Type tkid tkassign Exp tksc {insertToScope($2.lexeme,$1.type);} 
+    | Type tkid tksc {insertToScope($2->lexeme,$1->type);} 
+    | Type tkid tkassign Exp tksc {insertToScope($2->lexeme,$1->type);} 
     | tkid tkassign Exp tksc {} 
     | Call tksc {}
     | tkreturn tksc{}
@@ -111,18 +110,18 @@ Statement: tklbrace {createScope();} Statements tkrbrace {endScope();}
     ;
 M1: {createScope();};
 M2: {endScope();};
-Call : tkid tklp ExpList tkrp {$$.type=getType($1.lexeme);}
-    | tkid tklp tkrp {$$.type=getType($1.lexeme);}
+Call : tkid tklp ExpList tkrp {$$=new Expression();$$->type=getType($1->lexeme);}
+    | tkid tklp tkrp {$$=new Expression();$$->type=getType($1->lexeme);}
     ;
-ExpList : Exp{$$.types={$1.type;}}
+ExpList : Exp{$$=new ExpressionList();$$->types={$1->type};}
     | Exp tkcomma ExpList {
-        $$.types=$3.types;
-        $$.types.insert($$.types.begin(),$1.type);
+        $$=$3;
+        $$->types.insert($$->types.begin(),$1->type);
     }
     ;
-Type : tkint {$$.type="INT"}
-    | tkbyte {$$.type="BYTE"}
-    | tkbool {$$.type="BOOL"}
+Type : tkint {$$=new Expression();$$->type="INT";}
+    | tkbyte {$$=new Expression();$$->type="BYTE";}
+    | tkbool {$$=new Expression();$$->type="BOOL";}
     ;
 
 %%
@@ -130,7 +129,6 @@ Type : tkint {$$.type="INT"}
 int main()
 {
     //yydebug = 1; 
-    cout << "a" << endl;
 	yyparse();
 }
 

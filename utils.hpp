@@ -4,7 +4,11 @@
 #include <map>
 #include <string>
 #include "hw3_output.hpp"
+#include <iostream>
 using std::string;
+using std::cout;
+using std::endl;
+
 #define __utils_H
 struct Node
 {
@@ -21,19 +25,27 @@ struct ExpressionList : public Node
 struct Token : public Node
 {
     string lexeme;
-    Token(string &s) : lexeme(s)
+    Token(string s) : lexeme(s)
     {
     }
 };
-
-#define YYSTYPE Node * // Tell Bison to use STYPE as the stack type
+typedef union {
+    Expression* exp;
+    ExpressionList* expList;
+    Token* token;
+} STYPE;
+#define YYSTYPE STYPE // Tell Bison to use STYPE as the stack type
 struct SymbolRow
 {
     string type;
+    vector<string> arguments;
     int offset;
 };
 typedef std::map<string, SymbolRow> Scope;
 void createScope(bool is_function = false);
 void endScope();
-void insertToScope(const string &identifier, const string &type);
+void insertToScope(const string &identifier, const string &type,bool global = false);
+void addArguments(const string &identifier);
+const string& getType(const string& identifier);
+void init();
 #endif
