@@ -64,9 +64,13 @@ Program	:{init();}	Funcs
 Funcs	:   /* empty */ {}
     | FuncDecl Funcs {}
 	;
-FuncDecl :  RetType tkid {insertToScope($2->lexeme,$1->type,true);createScope(true);} tklp Formals tkrp {addArguments($2->lexeme);} tklbrace Statements tkrbrace {endScope();}
+FuncDecl :  RetType tkid {insertToScope($2->lexeme,$1->type,true);createScope(true);} tklp Formals tkrp {addArguments($2->lexeme);} tklbrace Statements tkrbrace 
+{endScope();
+delete $1;
+delete $2;
+}
 
-RetType:   Type {$$=$1;}
+RetType:   Type {$$=$1;delete $1;}
          | tkvoid{$$=new Expression();$$->type="VOID";};
 Formals:   /* empty */ {}
 	|	FormalsList {}
@@ -74,49 +78,50 @@ Formals:   /* empty */ {}
 FormalsList:   FormalDecl {} 
     |   FormalDecl tkcomma FormalsList {}
     ;
-FormalDecl: Type tkid {insertToScope($2->lexeme,$1->type);}
+FormalDecl: Type tkid {insertToScope($2->lexeme,$1->type);delete $1; delete $2;}
 Statements: Statement {}
         |   Statements Statement{}
         ;
 Exp: tklp Exp tkrp {$$=$2;}
-    | Exp tkarithmetic Exp {$$=$1;}
-    | Exp tkproduct Exp {$$=$1;}
-    | tkid {$$=new Expression();$$->type=getType($1->lexeme);}
+    | Exp tkarithmetic Exp {$$=$1; delete $3;}
+    | Exp tkproduct Exp {$$=$1;delete $3;}
+    | tkid {$$=new Expression();$$->type=getType($1->lexeme); delete $1;}
     | Call {$$=$1;}
-    | tknumber {$$=new Expression();$$->type="INT";}  
-    | tknumber tkb {$$=new Expression();$$->type="BYTE";} 
-    | tksrting {$$=new Expression();$$->type="STRING";}
+    | tknumber {$$=new Expression();$$->type="INT"; delete $1;}  
+    | tknumber tkb {$$=new Expression();$$->type="BYTE"; delete $1;} 
+    | tksrting {$$=new Expression();$$->type="STRING"; delete $1;}
     | tktrue {$$=new Expression();$$->type="BOOL";} 
     | tkfalse {$$=new Expression();$$->type="BOOL";}
-    | tknot Exp {$$=new Expression();$$->type="BOOL";}
-    | Exp tkand Exp {$$=new Expression();$$->type="BOOL";}
-    | Exp tkor Exp {$$=new Expression();$$->type="BOOL";}
-    | Exp tkequality Exp {$$=new Expression();$$->type="BOOL";}
-    | Exp tkorder Exp {$$=new Expression();$$->type="BOOL";}
+    | tknot Exp {$$=new Expression();$$->type="BOOL";delete $2;}
+    | Exp tkand Exp {$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
+    | Exp tkor Exp {$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
+    | Exp tkequality Exp {$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
+    | Exp tkorder Exp {$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
     ;
 Statement: tklbrace {createScope();} Statements tkrbrace {endScope();}
-    | Type tkid tksc {insertToScope($2->lexeme,$1->type);} 
-    | Type tkid tkassign Exp tksc {insertToScope($2->lexeme,$1->type);} 
-    | tkid tkassign Exp tksc {} 
-    | Call tksc {}
+    | Type tkid tksc {insertToScope($2->lexeme,$1->type); delete $1; delete $2;} 
+    | Type tkid tkassign Exp tksc {insertToScope($2->lexeme,$1->type); delete $1; delete $2; delete $4;} 
+    | tkid tkassign Exp tksc {delete $1; delete $3;} 
+    | Call tksc {delete $1;}
     | tkreturn tksc{}
-    | tkreturn Exp tksc{}
-    | tkif tklp Exp tkrp M1 Statement M2 %prec then
-    | tkif tklp Exp tkrp M1 Statement  M2  tkelse M1 Statement M2 {}
-    | tkwhile tklp Exp tkrp M1 Statement M2 %prec then
-    | tkwhile tklp Exp tkrp M1 Statement M2 tkelse M1 Statement M2
+    | tkreturn Exp tksc{delete $2;}
+    | tkif tklp Exp tkrp M1 Statement M2 {delete $3;} %prec then 
+    | tkif tklp Exp tkrp M1 Statement  M2  tkelse M1 Statement M2 {delete $3;}
+    | tkwhile tklp Exp tkrp M1 Statement M2 {delete $3;} %prec then
+    | tkwhile tklp Exp tkrp M1 Statement M2 tkelse M1 Statement M2 {delete $3;}
     | tkbreak tksc{}
     | tkcontinue tksc{}
     ;
 M1: {createScope();};
 M2: {endScope();};
-Call : tkid tklp ExpList tkrp {$$=new Expression();$$->type=getType($1->lexeme);}
-    | tkid tklp tkrp {$$=new Expression();$$->type=getType($1->lexeme);}
+Call : tkid tklp ExpList tkrp {$$=new Expression();$$->type=getType($1->lexeme); delete $1; delete $3;}
+    | tkid tklp tkrp {$$=new Expression();$$->type=getType($1->lexeme); delete $1;}
     ;
-ExpList : Exp{$$=new ExpressionList();$$->types={$1->type};}
+ExpList : Exp{$$=new ExpressionList();$$->types={$1->type}; delete $1;}
     | Exp tkcomma ExpList {
         $$=$3;
         $$->types.insert($$->types.begin(),$1->type);
+        delete $1;
     }
     ;
 Type : tkint {$$=new Expression();$$->type="INT";}
