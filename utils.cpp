@@ -1,15 +1,22 @@
 #include "utils.hpp"
 std::vector<Scope> scopes;
+std::vector<vector<string>> scopes_variables;
 std::vector<int> offsets;
 string temp="Fsfsa";
 void init(){
 //    cout << "init" << endl;
     scopes.push_back(Scope());
+    scopes_variables.push_back(vector<string>());
     offsets.push_back(0);
+    insertToScope("print","VOID");
+    insertToScope("printi","VOID");
+    scopes[0]["print"].arguments.push_back("STRING");
+    scopes[0]["printi"].arguments.push_back("INT");
 }
 void createScope(bool is_function){
     //cout << "createScope" << is_function << endl;
     scopes.push_back(Scope());
+    scopes_variables.push_back(vector<string>());
     if(!is_function){
         offsets.push_back(offsets[offsets.size()-1]);
     } else {
@@ -21,9 +28,15 @@ void endScope(){
     //cout << "endScope" << endl;
     output::endScope();
     auto& scope = scopes.back();   
-    for(auto& item: scope){
-            output::printID(item.first,item.second.offset , item.second.type);
+    auto& variables = scopes_variables.back();
+    for(auto& variable: variables){
+            if(scopes.size()>1){
+                output::printID(variable,scope[variable].offset ,scope[variable].type);
+            } else {
+                output::printID(variable,scope[variable].offset ,output::makeFunctionType(scope[variable].type,scope[variable].arguments));
+            }
     }
+    scopes_variables.pop_back();
     scopes.pop_back();
     offsets.pop_back();
 }
@@ -41,21 +54,21 @@ const string& getType(const string& identifier){
 void addArguments(const string& identifier){
     //cout << "addArguments" << identifier << endl;
     auto& x=scopes[0][identifier];
-    auto& current_scope = *(scopes.end()-1);
+    auto& current_scope = scopes.back();
     for(auto& it : current_scope){
         x.arguments.push_back(it.second.type);
     }
     *(offsets.end()-1)=0;
-    // some error
 }
-void insertToScope(const string& identifier,const string& type,bool global){
+void insertToScope(const string& identifier,const string& type){
     // cout << "insertToScope" << identifier << endl;
     if(false){}
-    auto& last = *(scopes.end()-1);
-    int& offset = *(offsets.end()-1);
+    auto& last = scopes.back();
+    int& offset = offsets.back();
     //cout << "insertToScope" << identifier << type << global<<offset<< endl;
     last[identifier]={type,vector<string>(),offset};
-    if(!global){
+    scopes_variables.back().push_back(identifier);
+    if(scopes.size()>1){
         if(offset<0){
             offset--;
         } else {

@@ -44,7 +44,7 @@ struct SymbolRow
 typedef std::map<string, SymbolRow> Scope;
 void createScope(bool is_function = false);
 void endScope();
-void insertToScope(const string &identifier, const string &type,bool global = false);
+void insertToScope(const string &identifier, const string &type);
 void addArguments(const string &identifier);
 const string& getType(const string& identifier);
 void init();

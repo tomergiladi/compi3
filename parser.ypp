@@ -64,11 +64,15 @@ Program	:{init();}	Funcs
 Funcs	:   /* empty */ {}
     | FuncDecl Funcs {}
 	;
-FuncDecl :  RetType tkid {insertToScope($2->lexeme,$1->type,true);createScope(true);} tklp Formals tkrp {addArguments($2->lexeme);} tklbrace Statements tkrbrace 
-{endScope();
-delete $1;
-delete $2;
-}
+FuncDecl :  RetType tkid {
+        insertToScope($2->lexeme,$1->type);createScope(true);
+    } tklp Formals tkrp {
+        addArguments($2->lexeme);
+    } tklbrace Statements tkrbrace {
+        endScope();
+        delete $1;
+        delete $2;
+    }
 
 RetType:   Type {$$=$1;}
          | tkvoid{$$=new Expression();$$->type="VOID";};
@@ -78,7 +82,9 @@ Formals:   /* empty */ {}
 FormalsList:   FormalDecl {} 
     |   FormalDecl tkcomma FormalsList {}
     ;
-FormalDecl: Type tkid {insertToScope($2->lexeme,$1->type);delete $1; delete $2;}
+FormalDecl: Type tkid {
+        insertToScope($2->lexeme,$1->type);delete $1; delete $2;
+    }
 Statements: Statement {}
         |   Statements Statement{}
         ;
