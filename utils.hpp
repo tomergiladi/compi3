@@ -46,6 +46,6 @@ void createScope(bool is_function = false);
 void endScope();
 void insertToScope(const string &identifier, const string &type);
 void addArguments(const string &identifier);
-const string& getType(const string& identifier);
+const string& getType(const string& identifier,bool is_function);
 void init();
 #endif

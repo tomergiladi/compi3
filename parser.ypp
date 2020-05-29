@@ -83,7 +83,7 @@ FormalsList:   FormalDecl {}
     |   FormalDecl tkcomma FormalsList {}
     ;
 FormalDecl: Type tkid {
-        insertToScope($2->lexeme,$1->type);delete $1; delete $2;
+          insertToScope($2->lexeme,$1->type);delete $1; delete $2;
     }
 Statements: Statement {}
         |   Statements Statement{}
@@ -91,7 +91,7 @@ Statements: Statement {}
 Exp: tklp Exp tkrp {$$=$2;}
     | Exp tkarithmetic Exp {$$=$1; delete $3;}
     | Exp tkproduct Exp {$$=$1;delete $3;}
-    | tkid {$$=new Expression();$$->type=getType($1->lexeme); delete $1;}
+    | tkid {$$=new Expression();$$->type=getType($1->lexeme,false); delete $1;}
     | Call {$$=$1;}
     | tknumber {$$=new Expression();$$->type="INT"; delete $1;}  
     | tknumber tkb {$$=new Expression();$$->type="BYTE"; delete $1;} 
@@ -120,8 +120,8 @@ Statement: tklbrace {createScope();} Statements tkrbrace {endScope();}
     ;
 M1: {createScope();};
 M2: {endScope();};
-Call : tkid tklp ExpList tkrp {$$=new Expression();$$->type=getType($1->lexeme); delete $1; delete $3;}
-    | tkid tklp tkrp {$$=new Expression();$$->type=getType($1->lexeme); delete $1;}
+Call : tkid tklp ExpList tkrp {$$=new Expression();$$->type=getType($1->lexeme,true); delete $1; delete $3;}
+    | tkid tklp tkrp {$$=new Expression();$$->type=getType($1->lexeme,true); delete $1;}
     ;
 ExpList : Exp{$$=new ExpressionList();$$->types={$1->type}; delete $1;}
     | Exp tkcomma ExpList {

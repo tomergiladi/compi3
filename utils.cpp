@@ -1,4 +1,5 @@
 #include "utils.hpp"
+extern int yylineno;
 std::vector<Scope> scopes;
 std::vector<vector<string>> scopes_variables;
 std::vector<int> offsets;
@@ -40,15 +41,24 @@ void endScope(){
     scopes.pop_back();
     offsets.pop_back();
 }
-const string& getType(const string& identifier){
+const string& getType(const string& identifier,bool is_function){
     //cout << "getType" << identifier << endl;
-    for(auto it=scopes.rbegin();it<scopes.rend();it++){
+    if(is_function){
+        if(scopes[0].find(identifier)!=scope.end()){
+            return scope[identifier].type;
+        }
+        output::errorUndefFunc(yylineno,identifier);
+        exit(0);
+    } 
+    for(auto it=scopes.rbegin();it<scopes.rend()-1;it++){
         auto& scope = *it;
         if(scope.find(identifier)!=scope.end()){
             return scope[identifier].type;
         }
     }
-    return temp;
+    output::errorUndef(yylineno,identifier);
+    exit(0);
+    
     // some error
 }
 void addArguments(const string& identifier){
@@ -58,11 +68,17 @@ void addArguments(const string& identifier){
     for(auto& it : current_scope){
         x.arguments.push_back(it.second.type);
     }
-    *(offsets.end()-1)=0;
+    offsets.back()=0;
 }
 void insertToScope(const string& identifier,const string& type){
     // cout << "insertToScope" << identifier << endl;
-    if(false){}
+    for(auto it=scopes.rbegin();it<scopes.rend();it++){
+        auto& scope = *it;
+        if(scope.find(identifier)!=scope.end()){
+            output::errorDef(yylineno,identifier);
+            exit(0);
+        }
+    }
     auto& last = scopes.back();
     int& offset = offsets.back();
     //cout << "insertToScope" << identifier << type << global<<offset<< endl;
