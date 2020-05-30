@@ -48,4 +48,6 @@ void insertToScope(const string &identifier, const string &type);
 void addArguments(const string &identifier);
 const string& getType(const string& identifier,bool is_function);
 void init();
+void checkCall(Token*,ExpressionList*);
+void checkExpressionType(const string& type1,const string& type2);
 #endif

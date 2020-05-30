@@ -44,8 +44,8 @@ void endScope(){
 const string& getType(const string& identifier,bool is_function){
     //cout << "getType" << identifier << endl;
     if(is_function){
-        if(scopes[0].find(identifier)!=scope.end()){
-            return scope[identifier].type;
+        if(scopes[0].find(identifier)!=scopes[0].end()){
+            return scopes[0][identifier].type;
         }
         output::errorUndefFunc(yylineno,identifier);
         exit(0);
@@ -65,8 +65,9 @@ void addArguments(const string& identifier){
     //cout << "addArguments" << identifier << endl;
     auto& x=scopes[0][identifier];
     auto& current_scope = scopes.back();
-    for(auto& it : current_scope){
-        x.arguments.push_back(it.second.type);
+    auto& variables = scopes_variables.back();
+    for(auto& variable: variables){
+        x.arguments.push_back(current_scope[variable].type);
     }
     offsets.back()=0;
 }
@@ -90,5 +91,36 @@ void insertToScope(const string& identifier,const string& type){
         } else {
             offset++;
         }
+    }
+}
+bool validCast(const string& type1,const string& type2){
+    if(type1==type2)
+        return true;
+    if(type1=="INT" && type2 == "BYTE")
+        return true;
+    return false;
+    
+}
+void checkCall(Token* token,ExpressionList* list){
+    if(scopes[0].find(token->lexeme)==scopes[0].end()){
+        output::errorUndefFunc(yylineno,token->lexeme);
+        exit(0);
+    }
+    auto& arguments=scopes[0][token->lexeme].arguments;
+    if((!list && arguments.size()!=0)||(arguments.size()!=list->types.size())){
+        output::errorPrototypeMismatch(yylineno,token->lexeme,arguments);
+        exit(0);
+    }
+    for(int i=0;i<arguments.size();i++){
+        if(!validCast(arguments[i],list->types[i])){
+            output::errorPrototypeMismatch(yylineno,token->lexeme,arguments);
+            exit(0);
+        }
+    }
+}
+void checkExpressionType(const string& type1,const string& type2){
+    if(!validCast(type1,type2)){
+        output::errorMismatch(yylineno);
+        exit(0);
     }
 }
