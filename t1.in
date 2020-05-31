@@ -1,21 +1,9 @@
-void printOk(bool isOk,int isnotOk) {
-    int x;
-    if (isOk){
-        int y;
-        {
-            int z;
-        }
-        print("ok");
-    } 
-}
-
-void main()
-{
-    int x = 5;
-    byte y =5b;
-    printOk(x>y,5);
-    int z;
-    while(true){
-    break;
-    }
+void main() {
+	bool var0 = ((82 b >= 35 b) or (50 b < 20 b)) and (((90   - 72  ) > 43  ) or (8 b <= 57 b));
+	bool var1 = (not (9   < 47 b)) or ((56   >= 6  ) or (16 b > 47 b)) and ((56 b != (42 b * 53 b)) or (90   < (38 b / 79 b)));
+	bool var2 = (not (58 b > 54 b)) or (not (3 b > 35 b)) and (not (76   > 80  )) or (not (66   != 32 b));
+	bool var3 = (not (6   >= 71 b)) or ((66 b < 3  ) or (19   <= ((52   - (82   / (((((94   / (32 b + 44 b)) * 3  ) * 72  ) / 57  ) / 66 b))) / 12  ))) and ((60 b > 75 b) or (44   <= 81 b)) and ((43   != 8 b) or (46 b <= 60  )) and (not (49   >= (67 b / 1 b)));
+	bool var4 = ((34 b <= 22  ) or (85 b > 1 b)) or ((6 b <= 19  ) and ((49   / 84 b) > (12   - 94 b))) and (not (31 b <= 42  )) and ((96   == 44 b) and ((70 b / 95  ) == 38  )) and (not ((10   + 14  ) >= 68 b)) or ((9   < 57  ) and (99   <= 40 b));
+	bool var5 = ((73   != 89  ) or (55 b >= 11  )) and ((5   >= 24  ) and (3 b != (87   + 31 b))) and ((8 b != 1  ) or ((80 b / ((57   * 35  ) * 25 b)) < 5 b)) or ((56   > 55 b) or (18   != 63  )) and (not ((55 b + 24 b) <= 30  )) or ((100   > 7 b) and (35 b > 20  )) or (not (80   >= 78  ));
+	bool var6 = (not (29   == 3  )) or (not (2   < 57  )) and ((61 b >= 28  ) or (92 b < 63 b)) and ((88   < (93 b * (48   / 81 b))) and (61   != 86  )) and (not (12   >= 45 b)) and (not (8 b == 69  )) and ((28 b != 37 b) or (75   > 65  )) or (not (17   <= 85  ));
 }

@@ -35,6 +35,7 @@ typedef union {
     Token* token;
 } STYPE;
 #define YYSTYPE STYPE // Tell Bison to use STYPE as the stack type
+#define YYINITDEPTH 5000
 struct SymbolRow
 {
     string type;
@@ -49,7 +50,7 @@ void addArguments(const string &identifier);
 const string& getType(const string& identifier,bool is_function=false);
 void init();
 void checkCall(Token*,ExpressionList*);
-void checkExpressionType(const string& type1,const string& type2);
+void checkExpressionType(const string& type1,const string& type2,bool symetric=false);
 void checkReturn(Expression* exp=NULL);
 void checkByteRange(Token*);
 string checkArithmetic(Expression*,Expression*);

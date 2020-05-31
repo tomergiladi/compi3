@@ -28,15 +28,16 @@ void createScope(bool is_function){
 }
 void endScope(){
     //cout << "endScope" << endl;
-    output::endScope();
+    
     auto& scope = scopes.back();   
     auto& variables = scopes_variables.back();
     if(scopes.size()==1){
-        if(scopes[0].find("main")==scopes[0].end()){
+        if(scope.find("main")==scope.end() || scope["main"].type!="VOID" || scope["main"].arguments.size()!=0){
             output::errorMainMissing();
             exit(0);
         }
     }
+    output::endScope();
     for(auto& variable: variables){
             if(scopes.size()>1){
                 output::printID(variable,scope[variable].offset ,scope[variable].type);
@@ -98,7 +99,12 @@ void insertToScope(const string& identifier,const string& type){
         } else {
             offset++;
         }
-    }
+    } /*else {
+        if(identifier=="main" && type != "VOID"){
+            output::errorMainMissing();
+            exit(0);
+        }
+    }*/
 }
 bool validCast(const string& type1,const string& type2){
     if(type1==type2)
@@ -114,7 +120,9 @@ void checkCall(Token* token,ExpressionList* list){
         exit(0);
     }
     auto& arguments=scopes[0][token->lexeme].arguments;
-    if((!list && arguments.size()!=0)||(arguments.size()!=list->types.size())){
+    int expectedSize=arguments.size();
+    int gotSize = list ? list->types.size() : 0;
+    if(expectedSize!=gotSize){
         output::errorPrototypeMismatch(yylineno,token->lexeme,arguments);
         exit(0);
     }
@@ -125,8 +133,8 @@ void checkCall(Token* token,ExpressionList* list){
         }
     }
 }
-void checkExpressionType(const string& type1,const string& type2){
-    if(!validCast(type1,type2)){
+void checkExpressionType(const string& type1,const string& type2,bool symetric){
+    if(!validCast(type1,type2) && (!symetric || !validCast(type2,type1))){
         output::errorMismatch(yylineno);
         exit(0);
     }
@@ -139,10 +147,7 @@ void checkReturn(Expression* exp){
     } else {
         type=exp->type;
     }
-    if(current_func.type!=type){
-        output::errorMismatch(yylineno);
-        exit(0);
-    }
+    checkExpressionType(current_func.type,type);
 
 }
 void checkByteRange(Token* token){

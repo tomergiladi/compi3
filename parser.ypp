@@ -101,7 +101,7 @@ Exp: tklp Exp tkrp {$$=$2;}
     | tknot Exp {checkExpressionType("BOOL",$2->type);$$=new Expression();$$->type="BOOL";delete $2;}
     | Exp tkand Exp {checkExpressionType("BOOL",$1->type);checkExpressionType("BOOL",$3->type);$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
     | Exp tkor Exp {checkExpressionType("BOOL",$1->type);checkExpressionType("BOOL",$3->type);$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
-    | Exp tkequality Exp {checkExpressionType($1->type,$3->type);$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
+    | Exp tkequality Exp {checkExpressionType($1->type,$3->type,true);$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
     | Exp tkorder Exp {checkExpressionType("INT",$1->type);checkExpressionType("INT",$3->type);$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
     ;
 Statement: tklbrace {createScope();} Statements tkrbrace {endScope();}

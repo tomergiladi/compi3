@@ -1505,7 +1505,7 @@ yyreduce:
 
   case 31:
 #line 104 "parser.ypp" /* yacc.c:1646  */
-    {checkExpressionType((yyvsp[-2].exp)->type,(yyvsp[0].exp)->type);(yyval.exp)=new Expression();(yyval.exp)->type="BOOL";delete (yyvsp[-2].exp); delete (yyvsp[0].exp);}
+    {checkExpressionType((yyvsp[-2].exp)->type,(yyvsp[0].exp)->type,true);(yyval.exp)=new Expression();(yyval.exp)->type="BOOL";delete (yyvsp[-2].exp); delete (yyvsp[0].exp);}
 #line 1510 "parser.tab.cpp" /* yacc.c:1646  */
     break;
 
