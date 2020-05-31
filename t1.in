@@ -12,7 +12,10 @@ void printOk(bool isOk,int isnotOk) {
 void main()
 {
     int x = 5;
-    byte y = 100 b;
-    printOk(x>y);
+    byte y =5b;
+    printOk(x>y,5);
     int z;
+    while(true){
+    break;
+    }
 }

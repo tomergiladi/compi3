@@ -89,38 +89,40 @@ Statements: Statement {}
         |   Statements Statement{}
         ;
 Exp: tklp Exp tkrp {$$=$2;}
-    | Exp tkarithmetic Exp {$$=$1; delete $3;}
-    | Exp tkproduct Exp {$$=$1;delete $3;}
+    | Exp tkarithmetic Exp {$$=new Expression(); $$->type=checkArithmetic($1,$3); delete $3;}
+    | Exp tkproduct Exp {$$=new Expression(); $$->type=checkArithmetic($1,$3);delete $3;}
     | tkid {$$=new Expression();$$->type=getType($1->lexeme,false); delete $1;}
     | Call {$$=$1;}
     | tknumber {$$=new Expression();$$->type="INT"; delete $1;}  
-    | tknumber tkb {$$=new Expression();$$->type="BYTE"; delete $1;} 
+    | tknumber tkb {checkByteRange($1);$$=new Expression();$$->type="BYTE"; delete $1;} 
     | tksrting {$$=new Expression();$$->type="STRING"; delete $1;}
     | tktrue {$$=new Expression();$$->type="BOOL";} 
     | tkfalse {$$=new Expression();$$->type="BOOL";}
-    | tknot Exp {$$=new Expression();$$->type="BOOL";delete $2;}
-    | Exp tkand Exp {$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
-    | Exp tkor Exp {$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
-    | Exp tkequality Exp {$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
-    | Exp tkorder Exp {$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
+    | tknot Exp {checkExpressionType("BOOL",$2->type);$$=new Expression();$$->type="BOOL";delete $2;}
+    | Exp tkand Exp {checkExpressionType("BOOL",$1->type);checkExpressionType("BOOL",$3->type);$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
+    | Exp tkor Exp {checkExpressionType("BOOL",$1->type);checkExpressionType("BOOL",$3->type);$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
+    | Exp tkequality Exp {checkExpressionType($1->type,$3->type);$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
+    | Exp tkorder Exp {checkExpressionType("INT",$1->type);checkExpressionType("INT",$3->type);$$=new Expression();$$->type="BOOL";delete $1; delete $3;}
     ;
 Statement: tklbrace {createScope();} Statements tkrbrace {endScope();}
     | Type tkid tksc {insertToScope($2->lexeme,$1->type); delete $1; delete $2;} 
-    | Type tkid tkassign Exp tksc {insertToScope($2->lexeme,$1->type); delete $1; delete $2; delete $4;} 
-    | tkid tkassign Exp tksc {delete $1; delete $3;} 
+    | Type tkid tkassign Exp tksc {checkExpressionType($1->type,$4->type);insertToScope($2->lexeme,$1->type); delete $1; delete $2; delete $4;} 
+    | tkid tkassign Exp tksc {checkExpressionType(getType($1->lexeme),$3->type);delete $1; delete $3;} 
     | Call tksc {delete $1;}
-    | tkreturn tksc{}
-    | tkreturn Exp tksc{delete $2;}
+    | tkreturn {checkReturn();} tksc{}
+    | tkreturn Exp {checkReturn($2);} tksc{delete $2;}
     | tkif tklp Exp BOOLCHECK tkrp M1 Statement M2 {delete $3;} %prec then 
     | tkif tklp Exp BOOLCHECK tkrp M1 Statement  M2  tkelse M1 Statement M2 {delete $3;}
-    | tkwhile tklp Exp BOOLCHECK tkrp M1 Statement M2 {delete $3;} %prec then
-    | tkwhile tklp Exp BOOLCHECK tkrp M1 Statement M2 tkelse M1 Statement M2 {delete $3;}
-    | tkbreak tksc{}
-    | tkcontinue tksc{}
+    | tkwhile tklp Exp BOOLCHECK tkrp M1 W1 Statement M2 W2 {delete $3;} %prec then
+    | tkwhile tklp Exp BOOLCHECK tkrp M1 W1 Statement M2 W2 tkelse M1 Statement M2 {delete $3;}
+    | tkbreak tksc{checkBreak();}
+    | tkcontinue tksc{checkContinue();}
     ;
 BOOLCHECK: {checkExpressionType("BOOL",$<exp>0->type);};
 M1: {createScope();};
 M2: {endScope();};
+W1: { raiseWhileCounter();};
+W2: { lowerWhileCounter();};
 
 Call : tkid tklp ExpList tkrp {checkCall($1,$3);$$=new Expression();$$->type=getType($1->lexeme,true); delete $1; delete $3;}
     | tkid tklp tkrp {checkCall($1,nullptr);$$=new Expression();$$->type=getType($1->lexeme,true); delete $1;}

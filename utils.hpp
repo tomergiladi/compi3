@@ -46,8 +46,15 @@ void createScope(bool is_function = false);
 void endScope();
 void insertToScope(const string &identifier, const string &type);
 void addArguments(const string &identifier);
-const string& getType(const string& identifier,bool is_function);
+const string& getType(const string& identifier,bool is_function=false);
 void init();
 void checkCall(Token*,ExpressionList*);
 void checkExpressionType(const string& type1,const string& type2);
+void checkReturn(Expression* exp=NULL);
+void checkByteRange(Token*);
+string checkArithmetic(Expression*,Expression*);
+void checkBreak();
+void checkContinue();
+void lowerWhileCounter();
+void raiseWhileCounter();
 #endif

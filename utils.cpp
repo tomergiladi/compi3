@@ -3,6 +3,7 @@ extern int yylineno;
 std::vector<Scope> scopes;
 std::vector<vector<string>> scopes_variables;
 std::vector<int> offsets;
+int whileCounter=0;
 string temp="Fsfsa";
 void init(){
 //    cout << "init" << endl;
@@ -30,6 +31,12 @@ void endScope(){
     output::endScope();
     auto& scope = scopes.back();   
     auto& variables = scopes_variables.back();
+    if(scopes.size()==1){
+        if(scopes[0].find("main")==scopes[0].end()){
+            output::errorMainMissing();
+            exit(0);
+        }
+    }
     for(auto& variable: variables){
             if(scopes.size()>1){
                 output::printID(variable,scope[variable].offset ,scope[variable].type);
@@ -121,6 +128,61 @@ void checkCall(Token* token,ExpressionList* list){
 void checkExpressionType(const string& type1,const string& type2){
     if(!validCast(type1,type2)){
         output::errorMismatch(yylineno);
+        exit(0);
+    }
+}
+void checkReturn(Expression* exp){
+    auto& current_func = scopes[0][scopes_variables[0].back()];
+    string type;
+    if(!exp){
+        type="VOID";
+    } else {
+        type=exp->type;
+    }
+    if(current_func.type!=type){
+        output::errorMismatch(yylineno);
+        exit(0);
+    }
+
+}
+void checkByteRange(Token* token){
+    int num = stol(token->lexeme);
+    if(num<0 || num >255){
+        output::errorByteTooLarge(yylineno,token->lexeme);
+        exit(0);
+    }
+}
+string checkArithmetic(Expression* exp1,Expression* exp2){
+    string type= "BYTE";
+    if(exp1->type=="INT")
+        type="INT";
+    else if(exp1->type!="BYTE"){
+        output::errorMismatch(yylineno);
+        exit(0);
+    }
+    if(exp2->type=="INT")
+        type="INT";
+    else if(exp2->type!="BYTE"){
+        output::errorMismatch(yylineno);
+        exit(0);
+    }
+    return type;
+}
+void raiseWhileCounter(){
+    whileCounter++;
+}
+void lowerWhileCounter(){
+    whileCounter--;
+}
+void checkContinue(){
+    if(whileCounter<=0){
+        output::errorUnexpectedContinue(yylineno);
+        exit(0);
+    }
+}
+void checkBreak(){
+    if(whileCounter<=0){
+        output::errorUnexpectedBreak(yylineno);
         exit(0);
     }
 }
